@@ -21,6 +21,7 @@
     <modules>
         <module>collabspace-eureka</module>
         <module>collabspace-gateway</module>
+        <module>collabspace-auth</module>
     </modules>
 
     <properties>
