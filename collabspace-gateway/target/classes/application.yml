@@ -1,0 +1,44 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: collabspace-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: auth-service
+          uri: lb://collabspace-auth
+          predicates:
+            - Path=/api/auth/**
+
+        - id: user-service
+          uri: lb://collabspace-user
+          predicates:
+            - Path=/api/users/**
+
+        - id: project-service
+          uri: lb://collabspace-project
+          predicates:
+            - Path=/api/workspaces/**, /api/projects/**, /api/tasks/**
+
+        - id: billing-service
+          uri: lb://collabspace-billing
+          predicates:
+            - Path=/api/billing/**
+
+        - id: notification-service
+          uri: lb://collabspace-notification
+          predicates:
+            - Path=/api/notifications/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
