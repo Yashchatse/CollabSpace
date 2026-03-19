@@ -35,6 +35,11 @@ spring:
           uri: lb://collabspace-notification
           predicates:
             - Path=/api/notifications/**
+            
+        - id: user-service
+          uri: lb://collabspace-user
+          predicates:
+            - Path=/api/users/**
 
 eureka:
   client:
