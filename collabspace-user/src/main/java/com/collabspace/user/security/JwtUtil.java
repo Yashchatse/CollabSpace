@@ -27,9 +27,11 @@ public class JwtUtil {
 
     public boolean isTokenValid(String token) {
         try {
+//            System.out.println("SECRET BEING USED: " + secret);
             getClaims(token);
             return true;
         } catch (JwtException e) {
+//            System.out.println("JWT ERROR: " + e.getMessage());
             return false;
         }
     }
