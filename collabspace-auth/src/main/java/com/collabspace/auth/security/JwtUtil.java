@@ -22,6 +22,7 @@ public class JwtUtil {
     }
 
     public String generateToken(String email, String role) {
+//    	System.out.println("SIGNING WITH SECRET: " + secret);
         return Jwts.builder()
                 .setSubject(email)
                 .claim("role", role)
@@ -41,9 +42,11 @@ public class JwtUtil {
 
     public boolean isTokenValid(String token) {
         try {
+//            System.out.println("SECRET BEING USED: " + secret);
             getClaims(token);
             return true;
         } catch (JwtException e) {
+//            System.out.println("JWT ERROR: " + e.getMessage());
             return false;
         }
     }
