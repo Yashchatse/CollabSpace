@@ -4,12 +4,9 @@
 .env.*
 !.env.example
 
-# Never commit yml files with real credentials
 **/src/main/resources/application.yml
 
-# ==========================================
-# Maven
-# ==========================================
+\
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -27,8 +24,7 @@ buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.properties
 
-# ==========================================
-# Eclipse
+
 # ==========================================
 .classpath
 .project
@@ -46,18 +42,12 @@ local.properties
 .apt_generated
 .apt_generated_test
 
-# ==========================================
-# IntelliJ IDEA (in case you switch later)
-# ==========================================
 .idea/
 *.iws
 *.iml
 *.ipr
 out/
 
-# ==========================================
-# Spring Boot
-# ==========================================
 spring-shell.log
 application-local.yml
 application-local.properties
@@ -70,9 +60,6 @@ logs/
 *.log.*
 log/
 
-# ==========================================
-# OS Files
-# ==========================================
 
 # Windows
 Thumbs.db
