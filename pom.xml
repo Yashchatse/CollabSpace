@@ -23,6 +23,7 @@
         <module>collabspace-gateway</module>
         <module>collabspace-auth</module>
         <module>collabspace-user</module>
+        <module>collabspace-project</module>
     </modules>
 
     <properties>

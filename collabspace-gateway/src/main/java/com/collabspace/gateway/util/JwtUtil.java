@@ -1,11 +1,10 @@
-package com.collabspace.user.security;
+package com.collabspace.gateway.util;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.security.Key;
-import java.util.Date;
 
 @Component
 public class JwtUtil {
@@ -27,11 +26,9 @@ public class JwtUtil {
 
     public boolean isTokenValid(String token) {
         try {
-//            System.out.println("SECRET BEING USED: " + secret);
             getClaims(token);
             return true;
         } catch (JwtException e) {
-//            System.out.println("JWT ERROR: " + e.getMessage());
             return false;
         }
     }
