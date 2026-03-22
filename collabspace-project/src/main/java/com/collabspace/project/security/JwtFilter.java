@@ -1,4 +1,4 @@
-package com.collabspace.user.security;
+package com.collabspace.project.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,7 +21,6 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Read from headers forwarded by Gateway
         String email = request.getHeader("X-Auth-Email");
         String role = request.getHeader("X-Auth-Role");
 
