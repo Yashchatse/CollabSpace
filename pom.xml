@@ -25,6 +25,7 @@
         <module>collabspace-user</module>
         <module>collabspace-project</module>
         <module>collabspace-billing</module>
+        <module>collabspace-notification</module>
     </modules>
 
     <properties>
