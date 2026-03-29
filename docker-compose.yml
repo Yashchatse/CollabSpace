@@ -1,18 +1,23 @@
 services:
 
   postgres:
-      image: postgres:15
-      container_name: collabspace-postgres
-      environment:
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: YashChatse
-      ports:
-        - "5432:5432"
-      volumes:
-        - postgres-data:/var/lib/postgresql/data
-        - /mnt/c/Users/ygfch/OneDrive/Desktop/Practices/collabspace-parent/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
-      networks:
-        - collabspace-network
+    image: postgres:15
+    container_name: collabspace-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: YashChatse
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - collabspace-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   eureka:
     build: ./collabspace-eureka
@@ -21,31 +26,44 @@ services:
       - "8761:8761"
     networks:
       - collabspace-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health | grep UP || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
 
   gateway:
-    build: ./collabspace-gateway   
+    build: ./collabspace-gateway
     container_name: collabspace-gateway
     ports:
       - "8080:8080"
     environment:
-      JWT_SECRET: "c0ll@bSp@ce$uper$ecretKey2024MustBe32!"
+      JWT_SECRET: "collabSpaceSuperSecretKey2024MustBe32chars"
       EUREKA_URL: http://eureka:8761/eureka/
     networks:
       - collabspace-network
+    depends_on:
+      eureka:
+        condition: service_healthy
 
   auth:
-    build: ./collabspace-auth     
+    build: ./collabspace-auth
     container_name: collabspace-auth
     ports:
       - "8081:8081"
     environment:
       DB_USERNAME: postgres
       DB_PASSWORD: YashChatse
-      JWT_SECRET: "c0ll@bSp@ce$uper$ecretKey2024MustBe32!"
+      JWT_SECRET: "collabSpaceSuperSecretKey2024MustBe32chars"
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/collabspace_auth
       EUREKA_URL: http://eureka:8761/eureka/
     networks:
       - collabspace-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
 
   user:
     build: ./collabspace-user
@@ -55,7 +73,7 @@ services:
     environment:
       DB_USERNAME: postgres
       DB_PASSWORD: YashChatse
-      JWT_SECRET: "c0ll@bSp@ce$uper$ecretKey2024MustBe32!"
+      JWT_SECRET: "collabSpaceSuperSecretKey2024MustBe32chars"
       CLOUDINARY_CLOUD_NAME: dbjat0rvp
       CLOUDINARY_API_KEY: 438463263177185
       CLOUDINARY_API_SECRET: 3Gag-zq1yzizj3qz-6_RdNkFCv
@@ -63,6 +81,11 @@ services:
       EUREKA_URL: http://eureka:8761/eureka/
     networks:
       - collabspace-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
 
   project:
     build: ./collabspace-project
@@ -72,7 +95,7 @@ services:
     environment:
       DB_USERNAME: postgres
       DB_PASSWORD: YashChatse
-      JWT_SECRET: "c0ll@bSp@ce$uper$ecretKey2024MustBe32!"
+      JWT_SECRET: "collabSpaceSuperSecretKey2024MustBe32chars"
       CLOUDINARY_CLOUD_NAME: dbjat0rvp
       CLOUDINARY_API_KEY: 438463263177185
       CLOUDINARY_API_SECRET: 3Gag-zq1yzizj3qz-6_RdNkFCv
@@ -80,6 +103,11 @@ services:
       EUREKA_URL: http://eureka:8761/eureka/
     networks:
       - collabspace-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
 
   billing:
     build: ./collabspace-billing
@@ -95,6 +123,11 @@ services:
       EUREKA_URL: http://eureka:8761/eureka/
     networks:
       - collabspace-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
 
   notification:
     build: ./collabspace-notification
@@ -108,9 +141,14 @@ services:
       EUREKA_URL: http://eureka:8761/eureka/
     networks:
       - collabspace-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
 
 networks:
   collabspace-network:
-  
+
 volumes:
   postgres-data:
