@@ -1,0 +1,116 @@
+services:
+
+  postgres:
+      image: postgres:15
+      container_name: collabspace-postgres
+      environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: YashChatse
+      ports:
+        - "5432:5432"
+      volumes:
+        - postgres-data:/var/lib/postgresql/data
+        - /mnt/c/Users/ygfch/OneDrive/Desktop/Practices/collabspace-parent/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      networks:
+        - collabspace-network
+
+  eureka:
+    build: ./collabspace-eureka
+    container_name: collabspace-eureka
+    ports:
+      - "8761:8761"
+    networks:
+      - collabspace-network
+
+  gateway:
+    build: ./collabspace-gateway   
+    container_name: collabspace-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      JWT_SECRET: "c0ll@bSp@ce$uper$ecretKey2024MustBe32!"
+      EUREKA_URL: http://eureka:8761/eureka/
+    networks:
+      - collabspace-network
+
+  auth:
+    build: ./collabspace-auth     
+    container_name: collabspace-auth
+    ports:
+      - "8081:8081"
+    environment:
+      DB_USERNAME: postgres
+      DB_PASSWORD: YashChatse
+      JWT_SECRET: "c0ll@bSp@ce$uper$ecretKey2024MustBe32!"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/collabspace_auth
+      EUREKA_URL: http://eureka:8761/eureka/
+    networks:
+      - collabspace-network
+
+  user:
+    build: ./collabspace-user
+    container_name: collabspace-user
+    ports:
+      - "8082:8082"
+    environment:
+      DB_USERNAME: postgres
+      DB_PASSWORD: YashChatse
+      JWT_SECRET: "c0ll@bSp@ce$uper$ecretKey2024MustBe32!"
+      CLOUDINARY_CLOUD_NAME: dbjat0rvp
+      CLOUDINARY_API_KEY: 438463263177185
+      CLOUDINARY_API_SECRET: 3Gag-zq1yzizj3qz-6_RdNkFCv
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/collabspace_user
+      EUREKA_URL: http://eureka:8761/eureka/
+    networks:
+      - collabspace-network
+
+  project:
+    build: ./collabspace-project
+    container_name: collabspace-project
+    ports:
+      - "8083:8083"
+    environment:
+      DB_USERNAME: postgres
+      DB_PASSWORD: YashChatse
+      JWT_SECRET: "c0ll@bSp@ce$uper$ecretKey2024MustBe32!"
+      CLOUDINARY_CLOUD_NAME: dbjat0rvp
+      CLOUDINARY_API_KEY: 438463263177185
+      CLOUDINARY_API_SECRET: 3Gag-zq1yzizj3qz-6_RdNkFCv
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/collabspace_project
+      EUREKA_URL: http://eureka:8761/eureka/
+    networks:
+      - collabspace-network
+
+  billing:
+    build: ./collabspace-billing
+    container_name: collabspace-billing
+    ports:
+      - "8084:8084"
+    environment:
+      DB_USERNAME: postgres
+      DB_PASSWORD: YashChatse
+      RAZORPAY_KEY_ID: rzp_test_SUmz8GgX9EYfYd
+      RAZORPAY_KEY_SECRET: OcypUfDPhFIl0V5d4EWBDlDj
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/collabspace_billing
+      EUREKA_URL: http://eureka:8761/eureka/
+    networks:
+      - collabspace-network
+
+  notification:
+    build: ./collabspace-notification
+    container_name: collabspace-notification
+    ports:
+      - "8085:8085"
+    environment:
+      DB_USERNAME: postgres
+      DB_PASSWORD: YashChatse
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/collabspace_notification
+      EUREKA_URL: http://eureka:8761/eureka/
+    networks:
+      - collabspace-network
+
+networks:
+  collabspace-network:
+  
+volumes:
+  postgres-data:
