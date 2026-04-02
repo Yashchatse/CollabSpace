@@ -10,6 +10,30 @@ A production-grade team collaboration platform built on Java Spring Boot microse
 
 ---
 
+## 🔴 Live Demo
+
+| Service | URL |
+|---|---|
+| API Gateway | `https://collabspace-gateway.up.railway.app` |
+| Eureka Dashboard | `https://collabspace-eureka.up.railway.app` |
+
+**Try it now:**
+```bash
+# Register
+curl -X POST https://collabspace-gateway.up.railway.app/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Your Name","email":"you@example.com","password":"yourpassword"}'
+
+# Login
+curl -X POST https://collabspace-gateway.up.railway.app/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"you@example.com","password":"yourpassword"}'
+```
+
+> Replace the Railway URLs above with your actual deployed URLs after deployment.
+
+---
+
 ## Architecture
 
 CollabSpace follows a microservices architecture with 7 independent services:
@@ -81,29 +105,43 @@ Sends email notifications via Gmail SMTP and real-time in-app notifications via 
 | Real-time | Spring WebSocket + STOMP |
 | Email | JavaMailSender + Gmail SMTP |
 | Build Tool | Maven |
-| Environment | spring-dotenv |
+| Containerization | Docker + Docker Compose |
 
 ---
 
 ## Getting Started
 
-### Prerequisites
+### Option A — Docker Compose (Recommended)
 
+```bash
+git clone https://github.com/Yashchatse/CollabSpace.git
+cd CollabSpace
+
+# Copy and fill in your env values
+cp .env.example .env
+
+# Build and start all 7 services
+docker compose up --build
+```
+
+Open `http://localhost:8761` — you should see all 6 services registered in the Eureka dashboard.
+
+### Option B — Run Services Manually
+
+#### Prerequisites
 - Java 17
 - Maven 3.8+
 - PostgreSQL 15
 - Git
 
-### 1. Clone the Repository
+#### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/Yashchatse/CollabSpace.git
 cd CollabSpace
 ```
 
-### 2. Create Databases
-
-Open pgAdmin or psql and run:
+#### 2. Create Databases
 
 ```sql
 CREATE DATABASE collabspace_auth;
@@ -113,9 +151,7 @@ CREATE DATABASE collabspace_billing;
 CREATE DATABASE collabspace_notification;
 ```
 
-### 3. Configure Environment Variables
-
-Each service reads from its own `.env` file. Copy the example file and fill in your values:
+#### 3. Configure Environment Variables
 
 ```bash
 cp collabspace-auth/.env.example collabspace-auth/.env
@@ -125,79 +161,17 @@ cp collabspace-billing/.env.example collabspace-billing/.env
 cp collabspace-notification/.env.example collabspace-notification/.env
 ```
 
-**Auth Service `.env`:**
-```
-DB_USERNAME=postgres
-DB_PASSWORD=your_password
-JWT_SECRET=your_jwt_secret_min_32_chars
-```
-
-**User Service `.env`:**
-```
-DB_USERNAME=postgres
-DB_PASSWORD=your_password
-JWT_SECRET=your_jwt_secret_min_32_chars
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-```
-
-**Project Service `.env`:**
-```
-DB_USERNAME=postgres
-DB_PASSWORD=your_password
-JWT_SECRET=your_jwt_secret_min_32_chars
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-```
-
-**Billing Service `.env`:**
-```
-DB_USERNAME=postgres
-DB_PASSWORD=your_password
-RAZORPAY_KEY_ID=rzp_test_your_key_id
-RAZORPAY_KEY_SECRET=your_key_secret
-```
-
-**Notification Service `.env`:**
-```
-DB_USERNAME=postgres
-DB_PASSWORD=your_password
-MAIL_USERNAME=yourgmail@gmail.com
-MAIL_PASSWORD=your_16_char_app_password
-```
-
-### 4. Start Services
-
-Start in this exact order — Eureka must be first:
+#### 4. Start Services (in order)
 
 ```bash
-# Terminal 1
-cd collabspace-eureka && mvn spring-boot:run
-
-# Terminal 2 (after Eureka is up)
-cd collabspace-gateway && mvn spring-boot:run
-
-# Terminal 3
-cd collabspace-auth && mvn spring-boot:run
-
-# Terminal 4
-cd collabspace-user && mvn spring-boot:run
-
-# Terminal 5
-cd collabspace-project && mvn spring-boot:run
-
-# Terminal 6
-cd collabspace-billing && mvn spring-boot:run
-
-# Terminal 7
-cd collabspace-notification && mvn spring-boot:run
+cd collabspace-eureka && mvn spring-boot:run   # Terminal 1 — wait for this first
+cd collabspace-gateway && mvn spring-boot:run  # Terminal 2
+cd collabspace-auth && mvn spring-boot:run     # Terminal 3
+cd collabspace-user && mvn spring-boot:run     # Terminal 4
+cd collabspace-project && mvn spring-boot:run  # Terminal 5
+cd collabspace-billing && mvn spring-boot:run  # Terminal 6
+cd collabspace-notification && mvn spring-boot:run # Terminal 7
 ```
-
-### 5. Verify All Services
-
-Open `http://localhost:8761` — you should see all 6 services registered in the Eureka dashboard.
 
 ---
 
@@ -281,6 +255,24 @@ Subscribe: /topic/notifications/{userEmail}
 
 ---
 
+## Testing
+
+Each service has JUnit 5 unit tests covering service logic and controller layer.
+
+```bash
+# Run tests for a specific service
+cd collabspace-auth && mvn test
+cd collabspace-user && mvn test
+```
+
+Test coverage includes:
+- `AuthServiceTest` — register, login, duplicate email, wrong password
+- `AuthControllerTest` — POST /register, POST /login with MockMvc
+- `UserServiceTest` — getProfile, updateProfile (partial), uploadAvatar, searchUsers
+- `UserControllerTest` — GET /me, PUT /me, POST /me/avatar, GET /search
+
+---
+
 ## External Services Setup
 
 ### Cloudinary (File Uploads)
@@ -302,7 +294,7 @@ Subscribe: /topic/notifications/{userEmail}
 ## Security
 
 - JWT tokens are validated only at the Gateway layer
-- Downstream services receive user identity via trusted internal headers
+- Downstream services receive user identity via trusted internal headers (`X-Auth-Email`, `X-Auth-Role`)
 - All credentials are managed via `.env` files — never committed to Git
 - Passwords are hashed with BCrypt
 - Each service has its own isolated PostgreSQL database
@@ -316,12 +308,14 @@ collabspace-parent/
 ├── collabspace-eureka/          Service discovery
 ├── collabspace-gateway/         API Gateway + JWT validation
 ├── collabspace-auth/            Authentication + JWT issuance
+│   └── src/test/java/           AuthServiceTest, AuthControllerTest
 ├── collabspace-user/            User profiles + Cloudinary
+│   └── src/test/java/           UserServiceTest, UserControllerTest
 ├── collabspace-project/         Workspaces + Kanban + WebSocket
 ├── collabspace-billing/         Razorpay payment integration
 ├── collabspace-notification/    Email + real-time notifications
+├── docker-compose.yml           One-command local setup
 ├── .env.example                 Environment variable template
-├── .gitignore
 └── pom.xml                      Parent POM
 ```
 
@@ -347,6 +341,7 @@ This project is licensed under the MIT License.
 
 **Yash Chatse**
 - GitHub: [@Yashchatse](https://github.com/Yashchatse)
+- LinkedIn: [yash-chatse-06398425a](https://www.linkedin.com/in/yash-chatse-06398425a)
 
 ---
 
