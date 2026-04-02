@@ -1,0 +1,5 @@
+[phases.build]
+cmds = ["mvn clean package -DskipTests -f pom.xml"]
+
+[start]
+cmd = "java -jar target/*.jar"
