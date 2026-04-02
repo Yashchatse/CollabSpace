@@ -135,10 +135,12 @@ services:
     ports:
       - "8085:8085"
     environment:
-      DB_USERNAME: postgres
-      DB_PASSWORD: YashChatse
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/collabspace_notification
-      EUREKA_URL: http://eureka:8761/eureka/
+        DB_USERNAME: postgres
+        DB_PASSWORD: YashChatse
+        SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/collabspace_notification
+        EUREKA_URL: http://eureka:8761/eureka/
+        MAIL_USERNAME: snappydramashorts@gmail.com
+        MAIL_PASSWORD: xyfp ezmr hzyw wyvp
     networks:
       - collabspace-network
     depends_on:
