@@ -9,13 +9,12 @@ A production-grade team collaboration platform built on Java Spring Boot microse
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ---
-
+<!--
 ## 🔴 Live Demo
 
 | Service | URL |
 |---|---|
-| API Gateway | `https://collabspace-gateway.up.railway.app` |
-| Eureka Dashboard | `https://collabspace-eureka.up.railway.app` |
+| API Gateway | `https://collabspace-gateway.up.railway.app` |**| Eureka Dashboard | `https://collabspace-eureka.up.railway.app` |
 
 **Try it now:**
 ```bash
@@ -32,7 +31,7 @@ curl -X POST https://collabspace-gateway.up.railway.app/api/auth/login \
 
 > Replace the Railway URLs above with your actual deployed URLs after deployment.
 
----
+--->
 
 ## Architecture
 
