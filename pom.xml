@@ -26,6 +26,7 @@
         <module>collabspace-project</module>
         <module>collabspace-billing</module>
         <module>collabspace-notification</module>
+        <module>collabspace-load-test</module>
     </modules>
 
     <properties>

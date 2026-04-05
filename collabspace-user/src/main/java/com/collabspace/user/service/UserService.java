@@ -44,7 +44,8 @@ public class UserService {
 
     public UserProfileResponse uploadAvatar(String email,
                                              MultipartFile file) throws IOException {
-        Map uploadResult = cloudinary.uploader().upload(
+    	@SuppressWarnings("unchecked")
+        Map<String, Object> uploadResult = cloudinary.uploader().upload(
                 file.getBytes(),
                 ObjectUtils.asMap(
                         "folder", "collabspace/avatars",

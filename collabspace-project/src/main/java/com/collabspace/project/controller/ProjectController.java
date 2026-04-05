@@ -26,4 +26,5 @@ public class ProjectController {
             @PathVariable Long workspaceId) {
         return ResponseEntity.ok(projectService.getProjects(workspaceId));
     }
+    
 }

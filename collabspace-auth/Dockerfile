@@ -1,11 +1,4 @@
-FROM maven:3.9-eclipse-temurin-17-alpine AS build
-WORKDIR /app
-COPY pom.xml .
-COPY collabspace-auth ./collabspace-auth
-RUN mvn -f pom.xml install -N -DskipTests
-RUN mvn -f collabspace-auth/pom.xml clean package -DskipTests
-
 FROM eclipse-temurin:17-jdk-alpine
 WORKDIR /app
-COPY --from=build /app/collabspace-auth/target/*.jar app.jar
+COPY target/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]

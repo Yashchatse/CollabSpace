@@ -1,6 +1,6 @@
 package com.collabspace.project.service;
 
-import com.cloudinary.Cloudinary;
+import com.cloudinary.Cloudinary;	
 import com.cloudinary.utils.ObjectUtils;
 import com.collabspace.project.dto.MoveTaskRequest;
 import com.collabspace.project.dto.TaskRequest;
@@ -91,7 +91,7 @@ public class TaskService {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
-        Long oldColumnId = task.getColumnId();
+//        Long oldColumnId = task.getColumnId();
         task.setColumnId(request.getTargetColumnId());
         task = taskRepository.save(task);
 
@@ -113,7 +113,9 @@ public class TaskService {
 
     public String uploadAttachment(Long taskId, MultipartFile file,
                                     String userEmail) throws IOException {
-        Map uploadResult = cloudinary.uploader().upload(
+    	
+    	@SuppressWarnings("unchecked")
+    	Map<String, Object> uploadResult = cloudinary.uploader().upload(
                 file.getBytes(),
                 ObjectUtils.asMap("folder", "collabspace/attachments")
         );
