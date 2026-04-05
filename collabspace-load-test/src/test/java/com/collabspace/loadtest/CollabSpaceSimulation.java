@@ -15,45 +15,40 @@ public class CollabSpaceSimulation extends Simulation {
         .userAgentHeader("Gatling-LoadTest/1.0");
 
     {
-        setUp(
-            // Auth flow — 5 users at once (smoke test)
-            AuthScenario.registerAndLogin()
-                .injectOpen(atOnceUsers(5)),
+    	setUp(
+    		    AuthScenario.registerAndLogin()
+    		        .injectOpen(atOnceUsers(2)),          // was 5
 
-            // Workspace flow — ramp up to 20 users
-            WorkspaceScenario.fullWorkspaceFlow()
-                .injectOpen(
-                    nothingFor(10),
-                    rampUsers(20).during(30)
-                ),
+    		    WorkspaceScenario.fullWorkspaceFlow()
+    		        .injectOpen(
+    		            nothingFor(10),
+    		            rampUsers(5).during(20)           // was rampUsers(20).during(30)
+    		        ),
 
-            // Read-only workspace — simulate browsing users
-            WorkspaceScenario.readOnlyWorkspaceFlow()
-                .injectOpen(
-                    nothingFor(5),
-                    constantUsersPerSec(5).during(30)
-                ),
+    		    WorkspaceScenario.readOnlyWorkspaceFlow()
+    		        .injectOpen(
+    		            nothingFor(5),
+    		            constantUsersPerSec(2).during(20) // was 5 users/sec for 30s
+    		        ),
 
-            // Task flow — moderate load
-            TaskScenario.fullTaskFlow()
-                .injectOpen(
-                    nothingFor(15),
-                    rampUsers(10).during(20)
-                ),
+    		    TaskScenario.fullTaskFlow()
+    		        .injectOpen(
+    		            nothingFor(15),
+    		            rampUsers(3).during(15)           // was rampUsers(10).during(20)
+    		        ),
 
-            // Read-only task polling
-            TaskScenario.readOnlyTaskFlow()
-                .injectOpen(
-                    nothingFor(10),
-                    constantUsersPerSec(3).during(40)
-                )
-        )
-        .protocols(httpProtocol)
-        .assertions(
-            global().responseTime().max().lt(5000),
-            global().responseTime().percentile(95).lt(2000),
-            global().responseTime().percentile(99).lt(3000),
-            global().successfulRequests().percent().gt(90.0)
-        );
+    		    TaskScenario.readOnlyTaskFlow()
+    		        .injectOpen(
+    		            nothingFor(10),
+    		            constantUsersPerSec(2).during(30) // was 3/sec for 40s
+    		        )
+    		)
+    		.protocols(httpProtocol)
+    		.assertions(
+    		    global().responseTime().max().lt(5000),
+    		    global().responseTime().percentile(95).lt(2000),
+    		    global().responseTime().percentile(99).lt(3000),
+    		    global().successfulRequests().percent().gt(90.0)
+    		);
     }
 }

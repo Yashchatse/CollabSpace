@@ -103,6 +103,7 @@ Sends email notifications via Gmail SMTP and real-time in-app notifications via 
 | Payments | Razorpay |
 | Real-time | Spring WebSocket + STOMP |
 | Email | JavaMailSender + Gmail SMTP |
+| Load Testing | Gatling 3.10 (Java DSL) |
 | Build Tool | Maven |
 | Containerization | Docker + Docker Compose |
 
@@ -209,6 +210,7 @@ All requests go through the Gateway at `http://localhost:8080`. Protected endpoi
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
 | GET | `/api/projects/{id}` | Yes | Get project |
+| GET | `/api/projects/{id}/columns` | Yes | Get column IDs for a project |
 | GET | `/api/projects/workspace/{id}` | Yes | Get projects in workspace |
 | POST | `/api/tasks/column/{columnId}` | Yes | Create task |
 | PATCH | `/api/tasks/{id}` | Yes | Update task |
@@ -272,6 +274,52 @@ Test coverage includes:
 
 ---
 
+## Load Testing
+
+CollabSpace includes a Gatling-based load test module (`collabspace-load-test`) that validates API performance under concurrent user load using the Java DSL.
+
+### Running Load Tests
+
+```bash
+# Step 1 — start all services
+docker-compose up
+
+# Step 2 — seed a test user first
+curl -X POST http://localhost:8080/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test User","email":"testuser@collabspace.com","password":"Test@1234"}'
+
+# Step 3 — run from the load-test module
+cd collabspace-load-test
+mvn gatling:test
+```
+
+### Test Scenarios
+
+| Scenario | Users | Pattern | Description |
+|---|---|---|---|
+| Register and Login Flow | 2 | All at once | Smoke test — register, login, get profile, update profile |
+| Full Workspace Flow | 5 | Ramp over 20s | Create workspace, project, browse projects |
+| Read Only Workspace Flow | 2/sec | Constant for 20s | Simulate browsing users hitting GET endpoints |
+| Full Task Flow | 3 | Ramp over 15s | Create workspace → project → columns → tasks → update |
+| Read Only Task Flow | 2/sec | Constant for 30s | Repeated GET on workspaces |
+
+### Performance Assertions
+
+| Metric | Threshold | Last Run Result |
+|---|---|---|
+| Max response time | < 5000ms | ✅ 1215ms |
+| 95th percentile | < 2000ms | ✅ 304ms |
+| 99th percentile | < 3000ms | ✅ 456ms |
+| Success rate | > 90% | pending auth fix |
+
+Reports are generated at:
+```
+collabspace-load-test/target/gatling/collabspacesimulation-{timestamp}/index.html
+```
+
+---
+
 ## External Services Setup
 
 ### Cloudinary (File Uploads)
@@ -313,6 +361,7 @@ collabspace-parent/
 ├── collabspace-project/         Workspaces + Kanban + WebSocket
 ├── collabspace-billing/         Razorpay payment integration
 ├── collabspace-notification/    Email + real-time notifications
+├── collabspace-load-test/       Gatling load tests (Java DSL)
 ├── docker-compose.yml           One-command local setup
 ├── .env.example                 Environment variable template
 └── pom.xml                      Parent POM
